@@ -7,7 +7,7 @@ from skimage import io, color
 from sklearn.cluster import KMeans
 
 problem2_dir = 'data/Problem2/'
-out_dir = 'results'
+out_dir = 'results_p2'
 filter_bank_file_path = problem2_dir + 'filterBank.mat'
 problem2_img_names = ['zebra.jpg', 'mountain.jpg']
 kmeans_num_clusters_color_seg = 10
