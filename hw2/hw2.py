@@ -18,12 +18,9 @@ def load_image(path):
   img = io.imread(path)
   img_lab = color.rgb2lab(img)
   img_grey = color.rgb2grey(img)
-  print(img_grey)
-  print(img_grey.shape)
   img_shape = img.shape
   img = img.reshape((-1,3))
   img_lab = img_lab.reshape((-1,3))
-  img_grey = img_grey.reshape((-1,1))
   return img, img_lab, img_grey, img_shape
 
 def save_image(img, path, shape):
@@ -35,8 +32,7 @@ def seg_image(img, num_clusters, label_colors):
   return seg
 
 def filter_image(img_grey, filter_bank, img_shape):
-  img_grey = img_grey.reshape((img_shape[0:2]))
-  return np.array([ssig.convolve2d(img_grey, filter_bank[:,:,i].reshape(49,49), boundary='symm', mode='same') for i in xrange(filter_bank.shape[2])]).reshape(-1, filter_bank.shape[2])
+  return np.array([ssig.convolve2d(img_grey, filter_bank[:,:,i].reshape(49,49), boundary='symm', mode='same') for i in xrange(filter_bank.shape[2])]).transpose((1,2,0)).reshape(-1, filter_bank.shape[2])
 
 if __name__ == "__main__":
   if not os.path.exists(out_dir):
