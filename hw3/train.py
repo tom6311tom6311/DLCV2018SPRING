@@ -5,12 +5,20 @@ import time
 import datetime
 import numpy as np
 import model
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
 from keras.callbacks import EarlyStopping
 
 PRETRAINED_VGG_MODEL_PATH = 'model/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
 OUTPUT_MODEL_PATH_PREFIX = 'model/out_'
 TRAIN_DATA_DIR = 'data/train/'
 MAX_EPOCHS = 100
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.8
+set_session(tf.Session(config=config))
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -38,18 +46,18 @@ if __name__ == '__main__':
   model.load_weights(PRETRAINED_VGG_MODEL_PATH, by_name=True)
 
   # Freeze the base layers.
-  for l, layer in enumerate(model.layers):
-    if l < 19:
-      layer.trainable = False
+  # for l, layer in enumerate(model.layers):
+  #   if l < 19:
+  #     layer.trainable = False
 
-  model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+  model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
   model.summary()
 
   print('loading training data...')
   train_imgs, train_labels = load_data(TRAIN_DATA_DIR)
 
   print('training...')
-  model.fit(train_imgs, train_labels, nb_epoch=MAX_EPOCHS, batch_size=64, callbacks=[EarlyStopping(patience=3)])
+  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=16, callbacks=[EarlyStopping(monitor='loss', patience=3)])
   model.save_weights(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '.h5')
 
   print('model saved.')  
