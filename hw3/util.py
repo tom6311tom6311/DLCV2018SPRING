@@ -24,6 +24,17 @@ def rgbToLabel(img):
   class_labels = r_layer * 4 + g_layer * 2 + b_layer * 1
   return onehot(class_labels)
 
+def labelToRgb(label):
+  tmp_label = label
+  b_layer = tmp_label % 2
+  tmp_label -= b_layer
+  tmp_label /= 2
+  g_layer = tmp_label % 2
+  tmp_label -= g_layer
+  tmp_label /= 2
+  r_layer = tmp_label % 2
+  return np.array([r_layer, g_layer, b_layer]) * 255
+
 def load_data(dir):
   file_names = os.listdir(dir)
   img_list = [[]] * (len(file_names) / 2)
