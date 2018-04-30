@@ -25,9 +25,9 @@ def build_model():
   x = Dropout(0.5)(x)
   x = Conv2D(4096, (1,1), activation='relu', padding='same', name='fcn_conv2')(x)
   x = Dropout(0.5)(x)
-  x = Conv2D(3, (1,1), padding='same', name='fcn_conv3')(x)
-  x = Conv2DTranspose(3, (8,8), strides=(4,4), padding='same', use_bias=False, name='fcn_conv_t1')(x)
-  x = Conv2DTranspose(3, (16,16), strides=(8,8), padding='same', use_bias=False, name='fcn_conv_t2')(x)
-  x = Activation('sigmoid')(x)
+  x = Conv2D(8, (1,1), padding='same', name='fcn_conv3')(x)
+  x = Conv2DTranspose(8, (8,8), strides=(4,4), padding='same', use_bias=False, name='fcn_conv_t1')(x)
+  x = Conv2DTranspose(8, (16,16), strides=(8,8), padding='same', use_bias=False, name='fcn_conv_t2')(x)
+  x = Activation('softmax')(x)
   model = Model(img_input, x)
   return model
