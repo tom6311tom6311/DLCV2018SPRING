@@ -33,7 +33,7 @@ if __name__ == '__main__':
   test_imgs, test_labels = util.load_data(VALID_DATA_DIR)
   
   print('\npredicting...')
-  test_label_predicted = np.argmax(np.around(model.predict(test_imgs)), axis=2)
+  test_label_predicted = np.argmax(np.around(model.predict(test_imgs)), axis=3)
 
   for idx,label in enumerate(test_label_predicted):
     cv2.imwrite(OUTPUT_DIR + str(idx).zfill(4) + '_mask.png', util.labelToRgb(label))

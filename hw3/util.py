@@ -33,7 +33,7 @@ def labelToRgb(label):
   tmp_label -= g_layer
   tmp_label /= 2
   r_layer = tmp_label % 2
-  return np.array([r_layer, g_layer, b_layer]) * 255
+  return np.transpose(np.array([r_layer, g_layer, b_layer]) * 255, (1, 2, 0))
 
 def load_data(dir):
   file_names = os.listdir(dir)
@@ -42,7 +42,7 @@ def load_data(dir):
   for i,file_name in enumerate(file_names):
     [idx, tp] = file_name.split('.')[0].split('_')
     if tp == 'sat':
-      img_list[int(idx)] = cv2.imread(dir + file_name)
+      img_list[int(idx)] = cv2.imread(dir + file_name) / 255.0
     elif tp == 'mask':
       label_list[int(idx)] = rgbToLabel(cv2.imread(dir + file_name))
     progress(i+1, len(file_names))

@@ -7,7 +7,7 @@ import model
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.utils import plot_model
 
 PRETRAINED_VGG_MODEL_PATH = 'model/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
@@ -30,7 +30,7 @@ if __name__ == '__main__':
   #   if l < 19:
   #     layer.trainable = False
 
-  model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+  model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
   model.summary()
   # plot_model(model, show_shapes=True, to_file='model/model.png')
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
   train_imgs, train_labels = util.load_data(TRAIN_DATA_DIR)
 
   print('training...')
-  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=16, callbacks=[EarlyStopping(monitor='loss', patience=3)])
+  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '-{epoch:02d}-{val_loss:.2f}.h5', period=10)])
   model.save_weights(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '.h5')
 
   print('model saved.')
