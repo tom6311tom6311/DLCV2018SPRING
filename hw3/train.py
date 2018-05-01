@@ -38,7 +38,7 @@ if __name__ == '__main__':
   train_imgs, train_labels = util.load_data(TRAIN_DATA_DIR)
 
   print('training...')
-  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '-{epoch:02d}-{val_loss:.2f}.h5', period=10)])
+  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '-{epoch:02d}-{val_loss:.2f}.h5', period=5)])
   model.save_weights(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '.h5')
 
   print('model saved.')

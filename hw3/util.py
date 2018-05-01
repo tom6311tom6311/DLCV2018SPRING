@@ -18,14 +18,14 @@ def onehot(a):
   return out
 
 def rgbToLabel(img):
-  r_layer = img[:,:,0] / 255
+  r_layer = img[:,:,2] / 255
   g_layer = img[:,:,1] / 255
-  b_layer = img[:,:,2] / 255
+  b_layer = img[:,:,0] / 255
   class_labels = r_layer * 4 + g_layer * 2 + b_layer * 1
   return onehot(class_labels)
 
 def labelToRgb(label):
-  tmp_label = label
+  tmp_label = np.argmax(label, axis=2)
   b_layer = tmp_label % 2
   tmp_label -= b_layer
   tmp_label /= 2
@@ -33,17 +33,20 @@ def labelToRgb(label):
   tmp_label -= g_layer
   tmp_label /= 2
   r_layer = tmp_label % 2
-  return np.transpose(np.array([r_layer, g_layer, b_layer]) * 255, (1, 2, 0))
+  img = np.transpose(np.array([b_layer, g_layer, r_layer]) * 255, (1, 2, 0))
+  return img
 
 def load_data(dir):
   file_names = os.listdir(dir)
-  img_list = [[]] * (len(file_names) / 2)
-  label_list = [[]] * (len(file_names) / 2)
+  file_names.sort()
+  img_list = []
+  label_list = []
   for i,file_name in enumerate(file_names):
-    [idx, tp] = file_name.split('.')[0].split('_')
+    tp = file_name.split('.')[0].split('_')[1]
     if tp == 'sat':
-      img_list[int(idx)] = cv2.imread(dir + file_name) / 255.0
+      img_list.append(cv2.imread(dir + file_name) / 255.0)
     elif tp == 'mask':
-      label_list[int(idx)] = rgbToLabel(cv2.imread(dir + file_name))
+      label_list.append(rgbToLabel(cv2.imread(dir + file_name)))
     progress(i+1, len(file_names))
+  labelToRgb(label_list[0])
   return np.array(img_list), np.array(label_list)
