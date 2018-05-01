@@ -39,7 +39,7 @@ if __name__ == '__main__':
   train_imgs, train_labels = util.load_data(TRAIN_DATA_DIR)
 
   print('training...')
-  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + '{epoch:02d}.hdf5', period=10, monitor='accuracy')])
+  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=8, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + '{epoch:02d}.hdf5', period=10, monitor='accuracy')])
   model.save_weights(OUTPUT_MODEL_PATH_PREFIX + '.h5')
 
   print('model saved.')
