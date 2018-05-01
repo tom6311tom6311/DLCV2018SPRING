@@ -27,7 +27,7 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_DIR)
 
   model = model.build_model()
-  model.load_weights(TRAINED_MODEL_PATH, by_name=True)
+  model.load_weights(TRAINED_MODEL_PATH)
 
   print('loading validation data...')
   test_imgs, test_labels = util.load_data(VALID_DATA_DIR)
