@@ -9,9 +9,9 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 TRAINED_MODEL_PATH = sys.argv[1]
-USE_BASELINE_MODEL = bool(sys.argv[2])
-OUTPUT_DIR = 'out/'
-VALID_DATA_DIR = 'data/validation/'
+USE_BASELINE_MODEL = str(sys.argv[2])
+VALID_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
+OUTPUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 

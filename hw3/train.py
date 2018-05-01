@@ -8,13 +8,13 @@ import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.utils import plot_model
+# from keras.utils import plot_model
 
 PRETRAINED_VGG_MODEL_PATH = 'model/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
-OUTPUT_MODEL_PATH_PREFIX = 'model/out_'
 TRAIN_DATA_DIR = 'data/train/'
-MAX_EPOCHS = 100
+MAX_EPOCHS = 80
 USE_BASELINE_MODEL = str(sys.argv[2])
+OUTPUT_MODEL_PATH_PREFIX = 'model/out_' + USE_BASELINE_MODEL + '_'
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1]) or '0'
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
   train_imgs, train_labels = util.load_data(TRAIN_DATA_DIR)
 
   print('training...')
-  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '-{epoch:02d}-{val_loss:.2f}.h5', period=5)])
-  model.save_weights(OUTPUT_MODEL_PATH_PREFIX + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d%H%M%S') + '.h5')
+  model.fit(train_imgs, train_labels, epochs=MAX_EPOCHS, batch_size=2, callbacks=[EarlyStopping(monitor='loss', patience=3), ModelCheckpoint(OUTPUT_MODEL_PATH_PREFIX + '{epoch:02d}.hdf5', period=10, monitor='accuracy')])
+  model.save_weights(OUTPUT_MODEL_PATH_PREFIX + '.h5')
 
   print('model saved.')

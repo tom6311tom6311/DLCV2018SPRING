@@ -48,5 +48,4 @@ def load_data(dir):
     elif tp == 'mask':
       label_list.append(rgbToLabel(cv2.imread(dir + file_name)))
     progress(i+1, len(file_names))
-  labelToRgb(label_list[0])
   return np.array(img_list), np.array(label_list)
