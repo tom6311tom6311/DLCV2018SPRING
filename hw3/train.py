@@ -14,6 +14,7 @@ PRETRAINED_VGG_MODEL_PATH = 'model/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
 OUTPUT_MODEL_PATH_PREFIX = 'model/out_'
 TRAIN_DATA_DIR = 'data/train/'
 MAX_EPOCHS = 100
+USE_BASELINE_MODEL = str(sys.argv[2])
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1]) or '0'
 
@@ -22,7 +23,7 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
 if __name__ == '__main__':
-  model = model.build_model()
+  model = model.build_model(USE_BASELINE_MODEL)
   model.load_weights(PRETRAINED_VGG_MODEL_PATH, by_name=True)
 
   # Freeze the base layers.

@@ -9,6 +9,7 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 TRAINED_MODEL_PATH = sys.argv[1]
+USE_BASELINE_MODEL = bool(sys.argv[2])
 OUTPUT_DIR = 'out/'
 VALID_DATA_DIR = 'data/validation/'
 
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     shutil.rmtree(OUTPUT_DIR)
     os.makedirs(OUTPUT_DIR)
 
-  model = model.build_model()
+  model = model.build_model(USE_BASELINE_MODEL)
   model.load_weights(TRAINED_MODEL_PATH)
 
   print('loading validation data...')
