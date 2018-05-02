@@ -159,11 +159,11 @@ def fcn8():
   o = Activation('relu')(o)
 
   o = Conv2DTranspose(8, kernel_size=(4,4), strides=(2,2), padding='same', use_bias=False, name='fcn_conv_t2')(o)
-  o2 = f3
-  o2 = (Conv2D(8, (1,1), kernel_initializer='he_normal', name='fcn_conv5'))(o2)
-  o2 = BatchNormalization()(o2)
-  o2, o = crop(o2, o, img_input)
-  o  = Add()([o2, o])
+  # o2 = f3
+  # o2 = (Conv2D(8, (1,1), kernel_initializer='he_normal', name='fcn_conv5'))(o2)
+  # o2 = BatchNormalization()(o2)
+  # o2, o = crop(o2, o, img_input)
+  # o  = Add()([o2, o])
   o = Activation('relu')(o)
   o = Conv2DTranspose(8, kernel_size=(16,16), strides=(8,8), padding='same', use_bias=False, name='fcn_conv_t3')(o)
 
