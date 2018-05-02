@@ -1,7 +1,7 @@
 import sys
 import shutil
 import os
-import cv2
+import scipy.misc
 import numpy as np
 import model
 import util
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_DIR)
 
   model = model.build_model(USE_BASELINE_MODEL)
-  model.load_weights(TRAINED_MODEL_PATH)
+  model.load_weights(TRAINED_MODEL_PATH, by_name=True)
 
   print('loading validation data...')
   test_imgs, test_labels = util.load_data(VALID_DATA_DIR)
@@ -37,6 +37,6 @@ if __name__ == '__main__':
   test_label_predicted = np.around(model.predict(test_imgs))
 
   for idx,label in enumerate(test_label_predicted):
-    cv2.imwrite(OUTPUT_DIR + str(idx).zfill(4) + '_mask.png', util.labelToRgb(label))
+    scipy.misc.imsave(OUTPUT_DIR + str(idx).zfill(4) + '_mask.png', util.labelToRgb(label))
   
   print('finished')
