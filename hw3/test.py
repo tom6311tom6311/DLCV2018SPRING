@@ -8,12 +8,12 @@ import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-TRAINED_MODEL_PATH = sys.argv[1]
+TRAINED_MODEL_PATH = sys.argv[3]
 USE_BASELINE_MODEL = str(sys.argv[2])
-VALID_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
-OUTPUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+VALID_DATA_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+OUTPUT_DIR = str(sys.argv[5]) if str(sys.argv[5])[-1] == '/' else str(sys.argv[5]) + '/'
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1]) or '0'
 
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.8
