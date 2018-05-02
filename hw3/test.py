@@ -1,7 +1,7 @@
 import sys
 import shutil
 import os
-import scipy.misc
+import cv2
 import numpy as np
 import model
 import util
@@ -37,6 +37,6 @@ if __name__ == '__main__':
   test_label_predicted = np.around(model.predict(test_imgs))
 
   for idx,label in enumerate(test_label_predicted):
-    scipy.misc.imsave(OUTPUT_DIR + str(idx).zfill(4) + '_mask.png', util.labelToRgb(label))
+    cv2.imwrite(OUTPUT_DIR + str(idx).zfill(4) + '_mask.png', util.labelToRgb(label))
   
   print('finished')

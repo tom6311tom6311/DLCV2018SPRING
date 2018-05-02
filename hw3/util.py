@@ -1,6 +1,6 @@
 import sys
 import os
-import scipy.misc
+import cv2
 import numpy as np
 
 def progress(count, total, suffix=''):
@@ -44,8 +44,8 @@ def load_data(dir):
   for i,file_name in enumerate(file_names):
     tp = file_name.split('.')[0].split('_')[1]
     if tp == 'sat':
-      img_list.append(scipy.misc.imread(dir + file_name) / 255.0)
+      img_list.append(cv2.imread(dir + file_name) / 255.0)
     elif tp == 'mask':
-      label_list.append(rgbToLabel(scipy.misc.imread(dir + file_name)))
+      label_list.append(rgbToLabel(cv2.imread(dir + file_name)))
     progress(i+1, len(file_names))
   return np.array(img_list), np.array(label_list)

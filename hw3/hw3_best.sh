@@ -14,4 +14,4 @@ fi
 
 mkdir -p model
 wget https://www.dropbox.com/s/n8rfs1dmgebyrsw/best.hdf5?dl=1 -O model/best.hdf5
-python3 test.py 0 False model/best.hdf5 $img_dir $out_dir
+python test.py 0 False model/best.hdf5 $img_dir $out_dir

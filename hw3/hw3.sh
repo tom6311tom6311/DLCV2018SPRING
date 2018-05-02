@@ -14,4 +14,4 @@ fi
 
 mkdir -p model
 wget https://www.dropbox.com/s/x1j3wabnp9b3qt4/baseline.hdf5?dl=1 -O model/baseline.hdf5
-python3 test.py 0 True model/baseline.hdf5 $img_dir $out_dir
+python test.py 0 True model/baseline.hdf5 $img_dir $out_dir
