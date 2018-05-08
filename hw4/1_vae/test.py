@@ -25,7 +25,7 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_IMG_DIR)
 
   print('\nLoading testing data...')
-  test_data = util.load_data(TEST_DATA_DIR)
+  test_data, test_file_names = util.load_data(TEST_DATA_DIR)
 
   print('\nLoading model...')
   autoenc = SimpleAE(test_data.shape[1], ENC_DIM)
@@ -37,8 +37,8 @@ if __name__ == '__main__':
 
   print('\nSaving predictions...')
   for i in range(decoded_imgs.shape[0]):
-    util.save_image(decoded_imgs[i,:], OUTPUT_IMG_DIR + str(i).zfill(5) + '.png')
+    util.save_image(decoded_imgs[i,:], OUTPUT_IMG_DIR + test_file_names[i])
     util.progress(i+1, decoded_imgs.shape[0])
   
-  print('\nfinished with models saved.')
+  print('\nfinished.')
 

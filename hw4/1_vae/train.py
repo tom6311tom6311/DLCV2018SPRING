@@ -27,7 +27,7 @@ if __name__ == '__main__':
     shutil.rmtree(OUTPUT_MODEL_DIR)
     os.makedirs(OUTPUT_MODEL_DIR)
   print('Loading training data...')
-  train_data = util.load_data(TRAIN_DATA_DIR)
+  train_data, train_file_names = util.load_data(TRAIN_DATA_DIR)
   print('\nLoading testing data...')
   test_data = util.load_data(TEST_DATA_DIR)
 

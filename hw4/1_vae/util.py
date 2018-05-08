@@ -18,7 +18,7 @@ def load_data(dir):
   for i,file_name in enumerate(file_names):
     img_list.append(scipy.misc.imread(dir + file_name).flatten() / 255.0)
     progress(i+1, len(file_names))
-  return np.array(img_list)
+  return np.array(img_list), file_names
 
 def save_image(arr, path):
   w = int(np.sqrt(arr.shape[-1]/3))
