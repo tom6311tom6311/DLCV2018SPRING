@@ -2,17 +2,18 @@ import sys
 import os
 import shutil
 from model.SimpleAE import SimpleAE
+from model.DeepAE import DeepAE
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-
+MODEL = 'deep'
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
-OUTPUT_MODEL_DIR = 'out_simple/'
-OUTPUT_MODEL_PATH_PREFIX = OUTPUT_MODEL_DIR + 'simple_'
-ENC_DIM = 1024
-MAX_EPOCHS = 200
+OUTPUT_MODEL_DIR = 'out_deep/'
+OUTPUT_MODEL_PATH_PREFIX = OUTPUT_MODEL_DIR + 'deep_'
+ENC_DIM = [4096, 1024, 512]
+MAX_EPOCHS = 1000
 BATCH_SIZE = 64
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
@@ -29,9 +30,13 @@ if __name__ == '__main__':
   print('Loading training data...')
   train_data, train_file_names = util.load_data(TRAIN_DATA_DIR)
   print('\nLoading testing data...')
-  test_data = util.load_data(TEST_DATA_DIR)
+  test_data, test_file_names = util.load_data(TEST_DATA_DIR)
 
-  autoenc = SimpleAE(train_data.shape[1], ENC_DIM)
+  if MODEL == 'simple':
+    autoenc = SimpleAE(train_data.shape[1], ENC_DIM[-1])
+  else:
+    autoenc = DeepAE(train_data.shape[1], ENC_DIM)
+
   autoenc.summary()
 
   print('\ntraining...')
