@@ -2,15 +2,16 @@ import sys
 import os
 import shutil
 from model.SimpleAE import SimpleAE
+from model.DeepAE import DeepAE
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-
+MODEL = 'conv'
 TEST_DATA_DIR = '../data/test/'
-OUTPUT_IMG_DIR = 'img_simple/'
+OUTPUT_IMG_DIR = 'img_conv/'
 MODEL_PATH = str(sys.argv[2])
-ENC_DIM = 1024
+ENC_DIM = [4096, 1024, 512]
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
@@ -28,7 +29,11 @@ if __name__ == '__main__':
   test_data, test_file_names = util.load_data(TEST_DATA_DIR)
 
   print('\nLoading model...')
-  autoenc = SimpleAE(test_data.shape[1], ENC_DIM)
+  if MODEL == 'simple':
+    autoenc = SimpleAE(test_data.shape[1], ENC_DIM[-1])
+  else:
+    autoenc = DeepAE(test_data.shape[1], ENC_DIM)
+
   autoenc.load_weights(MODEL_PATH)
 
   print('\nReconstructing...')
