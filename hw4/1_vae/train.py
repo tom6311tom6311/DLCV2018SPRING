@@ -9,7 +9,7 @@ from keras.backend.tensorflow_backend import set_session
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
 OUTPUT_MODEL_PATH_PREFIX = 'out/simple_'
-ENC_DIM = 200
+ENC_DIM = 1024
 MAX_EPOCHS = 100
 BATCH_SIZE = 64
 

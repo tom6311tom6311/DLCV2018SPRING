@@ -18,4 +18,4 @@ class SimpleAE(AEBase):
 		decoder_layer = self.autoencoder.layers[-1]
 		self.decoder = Model(input=encoded_input, output=decoder_layer(encoded_input))
 
-		self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+		self.autoencoder.compile(optimizer='adadelta', loss='mse')

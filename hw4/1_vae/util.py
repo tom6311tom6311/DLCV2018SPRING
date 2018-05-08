@@ -16,6 +16,6 @@ def load_data(dir):
   file_names.sort()
   img_list = []
   for i,file_name in enumerate(file_names):
-    img_list.append(scipy.misc.imread(dir + file_name).flatten())
+    img_list.append(scipy.misc.imread(dir + file_name).flatten() / 255.0)
     progress(i+1, len(file_names))
   return np.array(img_list)

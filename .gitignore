@@ -1,0 +1,9 @@
+hw1/
+hw2/
+hw3/
+hw4/1_vae/__pycache__/
+hw4/1_vae/model/__pycache__/
+hw4/data/
+hw4/tmp/
+hw4/hw4.pdf
+.vscode/
