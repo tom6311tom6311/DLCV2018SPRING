@@ -3,15 +3,17 @@ import os
 import shutil
 from model.SimpleAE import SimpleAE
 from model.DeepAE import DeepAE
+from model.ConvAE import ConvAE
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 MODEL = 'conv'
 TEST_DATA_DIR = '../data/test/'
-OUTPUT_IMG_DIR = 'img_conv/'
+OUTPUT_IMG_DIR = 'img_' + MODEL + '/'
 MODEL_PATH = str(sys.argv[2])
-ENC_DIM = [4096, 1024, 512]
+# ENC_DIM = [4096, 1024, 512]
+ENC_DIM = [(4, 4), (4, 16), (4, 64)]
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
@@ -26,13 +28,15 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_IMG_DIR)
 
   print('\nLoading testing data...')
-  test_data, test_file_names = util.load_data(TEST_DATA_DIR)
+  test_data, test_file_names = util.load_data(TEST_DATA_DIR, flatten=False)
 
   print('\nLoading model...')
   if MODEL == 'simple':
     autoenc = SimpleAE(test_data.shape[1], ENC_DIM[-1])
-  else:
+  elif MODEL == 'deep':
     autoenc = DeepAE(test_data.shape[1], ENC_DIM)
+  else:
+    autoenc = ConvAE(test_data.shape[1], ENC_DIM)
 
   autoenc.load_weights(MODEL_PATH)
 
@@ -42,7 +46,7 @@ if __name__ == '__main__':
 
   print('\nSaving predictions...')
   for i in range(decoded_imgs.shape[0]):
-    util.save_image(decoded_imgs[i,:], OUTPUT_IMG_DIR + test_file_names[i])
+    util.save_image(decoded_imgs[i,:], OUTPUT_IMG_DIR + test_file_names[i], isFlattened=False)
     util.progress(i+1, decoded_imgs.shape[0])
   
   print('\nfinished.')

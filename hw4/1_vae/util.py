@@ -11,16 +11,20 @@ def progress(count, total, suffix=''):
   sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
   sys.stdout.flush()
 
-def load_data(dir):
+def load_data(dir, flatten=True):
   file_names = os.listdir(dir)
   file_names.sort()
   img_list = []
   for i,file_name in enumerate(file_names):
-    img_list.append(scipy.misc.imread(dir + file_name).flatten() / 255.0)
+    img = scipy.misc.imread(dir + file_name) / 255.0
+    if flatten:
+      img = img.flatten()
+    img_list.append(img)
     progress(i+1, len(file_names))
   return np.array(img_list), file_names
 
-def save_image(arr, path):
-  w = int(np.sqrt(arr.shape[-1]/3))
-  arr = np.around(arr.reshape((w,w,3)) * 255)
-  scipy.misc.imsave(path, arr)
+def save_image(arr, path, isFlattened=True):
+  if (isFlattened):
+    w = int(np.sqrt(arr.shape[-1]/3))
+    arr = arr.reshape((w,w,3))
+  scipy.misc.imsave(path, np.around(arr * 255))
