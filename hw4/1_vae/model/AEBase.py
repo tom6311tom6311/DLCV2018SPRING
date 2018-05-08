@@ -14,7 +14,7 @@ class AEBase(object):
       callbacks.append(ModelCheckpoint(out_model_prefix + '{epoch:02d}.hdf5', period=10, monitor='accuracy'))
 
     self.autoencoder.fit(x_train, x_train,
-      nb_epoch=epochs,
+      epochs=epochs,
       batch_size=batch_size,
       shuffle=True,
       validation_data=(x_test, x_test),
@@ -28,3 +28,6 @@ class AEBase(object):
     
   def summary(self):
     self.autoencoder.summary()
+
+  def load_weights(self, path):
+    self.autoencoder.load_weights(path)

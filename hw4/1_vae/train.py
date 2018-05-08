@@ -12,7 +12,7 @@ TEST_DATA_DIR = '../data/test/'
 OUTPUT_MODEL_DIR = 'out_simple/'
 OUTPUT_MODEL_PATH_PREFIX = OUTPUT_MODEL_DIR + 'simple_'
 ENC_DIM = 1024
-MAX_EPOCHS = 100
+MAX_EPOCHS = 200
 BATCH_SIZE = 64
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])

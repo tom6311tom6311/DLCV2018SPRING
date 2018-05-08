@@ -19,3 +19,8 @@ def load_data(dir):
     img_list.append(scipy.misc.imread(dir + file_name).flatten() / 255.0)
     progress(i+1, len(file_names))
   return np.array(img_list)
+
+def save_image(arr, path):
+  w = int(np.sqrt(arr.shape[-1]/3))
+  arr = np.around(arr.reshape((w,w,3)) * 255)
+  scipy.misc.imsave(path, arr)
