@@ -4,17 +4,20 @@ import shutil
 from model.SimpleAE import SimpleAE
 from model.DeepAE import DeepAE
 from model.ConvAE import ConvAE
+from model.VariationalAE import VariationalAE
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-MODEL = 'conv'
+MODEL = 'vae'
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
 OUTPUT_MODEL_DIR = 'out_' + MODEL + '/'
 OUTPUT_MODEL_PATH_PREFIX = OUTPUT_MODEL_DIR + MODEL + '_'
 # ENC_DIM = [4096, 1024, 512]
 ENC_DIM = [(4, 4), (4, 16), (4, 64)]
+LATENT_DIM = 1024
+KL_LAMBDA = 1e-5
 MAX_EPOCHS = 1000
 BATCH_SIZE = 64
 
@@ -38,8 +41,10 @@ if __name__ == '__main__':
     autoenc = SimpleAE(train_data.shape[1], ENC_DIM[-1])
   elif MODEL == 'deep':
     autoenc = DeepAE(train_data.shape[1], ENC_DIM)
-  else:
+  elif MODEL == 'conv':
     autoenc = ConvAE(train_data.shape[1], ENC_DIM)
+  else:
+    autoenc = VariationalAE(train_data.shape[1], ENC_DIM, LATENT_DIM, KL_LAMBDA)
 
   autoenc.summary()
 
