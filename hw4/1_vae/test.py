@@ -4,16 +4,19 @@ import shutil
 from model.SimpleAE import SimpleAE
 from model.DeepAE import DeepAE
 from model.ConvAE import ConvAE
+from model.VariationalAE import VariationalAE
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-MODEL = 'conv'
+MODEL = 'vae'
 TEST_DATA_DIR = '../data/test/'
 OUTPUT_IMG_DIR = 'img_' + MODEL + '/'
 MODEL_PATH = str(sys.argv[2])
 # ENC_DIM = [4096, 1024, 512]
 ENC_DIM = [(4, 4), (4, 16), (4, 64)]
+LATENT_DIM = 1024
+KL_LAMBDA = 1e-5
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
@@ -35,13 +38,15 @@ if __name__ == '__main__':
     autoenc = SimpleAE(test_data.shape[1], ENC_DIM[-1])
   elif MODEL == 'deep':
     autoenc = DeepAE(test_data.shape[1], ENC_DIM)
-  else:
+  elif MODEL == 'conv':
     autoenc = ConvAE(test_data.shape[1], ENC_DIM)
+  else:
+    autoenc = VariationalAE(test_data.shape[1], ENC_DIM, LATENT_DIM, KL_LAMBDA)
 
   autoenc.load_weights(MODEL_PATH)
 
   print('\nReconstructing...')
-  encoded_imgs = autoenc.encode(test_data)
+  encoded_imgs = autoenc.encode(test_data)[2]
   decoded_imgs = autoenc.decode(encoded_imgs)
 
   print('\nSaving predictions...')
