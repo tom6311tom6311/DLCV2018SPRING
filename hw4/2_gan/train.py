@@ -2,18 +2,19 @@ import sys
 import os
 import shutil
 from model.DCGAN import DCGAN
+from model.PoolingDCGAN import PoolingDCGAN
 import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-MODEL = 'dcgan'
+MODEL = 'pool_dcgan'
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
 OUTPUT_MODEL_DIR = 'out_' + MODEL + '/'
 OUTPUT_MODEL_PATH_PREFIX = OUTPUT_MODEL_DIR + MODEL + '_'
 OUTPUT_IMG_DIR = 'img_' + MODEL + '/'
-DISCRIM_DIMS = [(32, 5, 2), (64, 5, 2), (128, 5, 2), (256, 3, 2), (512, 2, 2)]
-LATENT_DIM = 512
+DISCRIM_DIMS = [(32, 5, 2), (64, 5, 2), (128, 5, 2), (256, 5, 2), (512, 5, 2)]
+LATENT_DIM = 100
 MAX_EPOCHS = 10000
 BATCH_SIZE = 64
 CHK_POINT_INTERVAL = 10
@@ -40,7 +41,11 @@ if __name__ == '__main__':
   # print('\nLoading testing data...')
   # test_data, test_file_names = util.load_data(TEST_DATA_DIR, flatten=False)
 
-  gan = DCGAN(train_data.shape[1], DISCRIM_DIMS, LATENT_DIM)
+  if MODEL == 'dcgan':
+    gan = DCGAN(train_data.shape[1], DISCRIM_DIMS, LATENT_DIM)
+  else:
+    gan = PoolingDCGAN(train_data.shape[1], DISCRIM_DIMS, LATENT_DIM)
+
   gan.summary()
 
   print('\ntraining...')
