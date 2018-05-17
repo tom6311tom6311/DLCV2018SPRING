@@ -50,7 +50,7 @@ class DCGAN:
       gen = Activation('relu')(gen)
       # gen = Dropout(0.2)(gen)
 
-    gen = Conv2D(3, 1, strides=1, padding='same', activation='sigmoid')(gen)
+    gen = Conv2D(3, 1, strides=1, padding='same', activation='tanh')(gen)
 
     self.generator = Model(inputs=gen_input, outputs=gen)
     self.discriminator = Model(inputs=input_img, outputs=discrim)
@@ -94,7 +94,7 @@ class DCGAN:
         sys.stdout.write("batch %d d_loss : %f, g_loss : %f d_acc : %f, g_acc : %f\r" % (index, d_loss, g_loss, d_acc, g_acc))
         sys.stdout.flush()
         if epoch % chk_point_interval == chk_point_interval-1 and index % 100 == 0:
-          util.save_image(generated_images[0], out_img_dir + str(epoch) + '_' + str(index) + '.png', isFlattened=False, val_range=(0,1))
+          util.save_image(generated_images[0], out_img_dir + str(epoch) + '_' + str(index) + '.png', isFlattened=False, val_range=(-1,1))
       if epoch % chk_point_interval == chk_point_interval-1:
         self.generator.save_weights(out_model_prefix + str(epoch) + '_gen', True)
         self.discriminator.save_weights(out_model_prefix + str(epoch) + '_discrim', True)

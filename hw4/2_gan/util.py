@@ -11,7 +11,7 @@ def progress(count, total, suffix=''):
   sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
   sys.stdout.flush()
 
-def load_data(dir, flatten=True, val_range=(0,1)):
+def load_data(dir, label_path, flatten=True, val_range=(0,1)):
   file_names = os.listdir(dir)
   file_names.sort()
   img_list = []
@@ -21,7 +21,19 @@ def load_data(dir, flatten=True, val_range=(0,1)):
       img = img.flatten()
     img_list.append(img)
     progress(i+1, len(file_names))
-  return np.array(img_list), file_names
+  num_class = 0
+  raw_labels = []
+  with open(label_path, 'r') as label_file:
+    lines = label_file.readlines()
+    num_class = len(lines[0].split(',')) - 1
+    raw_labels = lines[1:]
+  labels = np.zeros((len(img_list), num_class))
+  for raw_label in raw_labels:
+    raw_label = raw_label.split(',')
+    img_idx = int(raw_label[0].split('.')[0])
+    label = np.array([float(l) for l in raw_label[1:]])
+    labels[img_idx] = label
+  return np.array(img_list), labels, file_names
 
 def save_image(arr, path, isFlattened=True, val_range=(0,1)):
   img = arr
