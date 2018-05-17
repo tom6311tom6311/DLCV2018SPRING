@@ -13,11 +13,13 @@ class AEBase(object):
     if save_check_points:
       callbacks.append(ModelCheckpoint(out_model_prefix + '{epoch:02d}.hdf5', period=10, monitor='accuracy'))
 
-    self.autoencoder.fit(x_train, x_train,
+    self.autoencoder.fit(
+      x_train,
+      # x_train,
       epochs=epochs,
       batch_size=batch_size,
       shuffle=True,
-      validation_data=(x_test, x_test),
+      validation_data=(x_test, None),
       callbacks=callbacks)
 
   def encode(self, x):

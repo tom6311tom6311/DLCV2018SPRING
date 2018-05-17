@@ -14,7 +14,7 @@ TEST_DATA_DIR = '../data/test/'
 OUTPUT_IMG_DIR = 'img_' + MODEL + '/'
 MODEL_PATH = str(sys.argv[2])
 # ENC_DIM = [4096, 1024, 512]
-ENC_DIM = [(4, 4), (4, 16), (4, 64)]
+ENC_DIM = [(64, 5, 2), (128, 5, 2), (256, 5, 2)]
 LATENT_DIM = 1024
 KL_LAMBDA = 1e-5
 

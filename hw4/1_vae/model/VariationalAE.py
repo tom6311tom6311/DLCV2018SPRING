@@ -1,5 +1,5 @@
 from model.AEBase import AEBase
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Dense, Lambda, Flatten, Reshape
+from keras.layers import Input, Conv2D, Conv2DTranspose, Dense, Lambda, Flatten, Reshape, BatchNormalization, Activation, Dropout
 from keras.models import Model
 from keras.losses import mse
 from keras import backend as K
@@ -10,9 +10,11 @@ class VariationalAE(AEBase):
 
     encoded = input_img
 
-    for i, (filters, kernel_size) in enumerate(encoding_conv_dims):
-      encoded = Conv2D(filters, kernel_size, padding='same', activation='relu', name='vae_enc_conv_'+str(i))(encoded)
-      encoded = MaxPooling2D((2, 2), padding='same', name= 'vae_enc_pool_'+str(i))(encoded)
+    for i, (filters, kernel_size, strides) in enumerate(encoding_conv_dims):
+      encoded = Conv2D(filters, kernel_size, strides=strides, padding='same', name='vae_enc_conv_'+str(i))(encoded)
+      encoded = BatchNormalization()(encoded)
+      encoded = Activation('relu')(encoded)
+      encoded = Dropout(0.3)(encoded)
 
     enc_last_shape = K.int_shape(encoded)
 
@@ -27,17 +29,18 @@ class VariationalAE(AEBase):
 
     decoder = Dense(enc_last_shape[1] * enc_last_shape[2] * enc_last_shape[3], activation='relu')(decoder)
     decoder = Reshape((enc_last_shape[1], enc_last_shape[2], enc_last_shape[3]))(decoder)
-    for j, (filters, kernel_size) in reversed(list(enumerate(encoding_conv_dims))):
-      decoder = Conv2D(filters, kernel_size, padding='same', activation='relu', name='vae_dec_conv_'+str(j))(decoder)
-      decoder = UpSampling2D((2, 2), name='vae_dec_upsample_'+str(j))(decoder)
+    for j, (filters, kernel_size, strides) in reversed(list(enumerate(encoding_conv_dims))):
+      decoder = Conv2DTranspose(filters, kernel_size, strides=strides, padding='same', name='vae_dec_conv_'+str(j))(decoder)
+      decoder = BatchNormalization()(decoder)
+      decoder = Activation('relu')(decoder)
 
     decoder = Conv2D(3, encoding_conv_dims[0][1], padding='same', activation='sigmoid', name='vae_decoded')(decoder)
 
-    self.encoder = Model(input=input_img, output=[z_mean, z_log_var, z])
-    self.decoder = Model(input=decoder_input, output=decoder)
+    self.encoder = Model(inputs=input_img, outputs=[z_mean, z_log_var, z])
+    self.decoder = Model(inputs=decoder_input, outputs=decoder)
 
     vae_out = self.decoder(self.encoder(input_img)[2])
-    self.autoencoder = Model(input=input_img, output=vae_out)
+    self.autoencoder = Model(inputs=input_img, outputs=vae_out)
 
     reconstruction_loss = mse(K.flatten(input_img), K.flatten(vae_out))
     # reconstruction_loss *= w_in * w_in * 3
@@ -46,7 +49,7 @@ class VariationalAE(AEBase):
     kl_loss *= -0.5
     vae_loss = K.mean(reconstruction_loss +  kl_lambda * kl_loss)
     self.autoencoder.add_loss(vae_loss)
-    self.autoencoder.compile(optimizer='adadelta', loss='mse')
+    self.autoencoder.compile(optimizer='rmsprop')
 
   def sampling(self, args):
     z_mean, z_log_var = args
