@@ -14,6 +14,7 @@ TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.arg
 TEST_LABEL_PATH = TEST_DATA_DIR + 'test.csv'
 TEST_DATA_DIR = TEST_DATA_DIR + 'test/'
 OUTPUT_IMG_DIR = 'fig3_3' + '/'
+OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 MODEL_PATH = str(sys.argv[2])
 DISCRIM_DIMS = [(128, 5, 2), (256, 5, 2), (512, 5, 2)]
 GEN_DIMS = [(512, 5, 2), (256, 5, 2), (128, 5, 2)]
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     util.save_image(generated_images[i], OUTPUT_IMG_DIR + 'gen_' + str(i) + '.png', isFlattened=False)
     img_paths.append(OUTPUT_IMG_DIR + 'gen_' + str(i) + '.png')
     util.progress(i+1, 20)
-  util.combine_images(64*10, 64*2, img_paths, 'fig3_3.jpg')
+  util.combine_images(64*10, 64*2, img_paths, OUT_DIR + 'fig3_3.jpg')
   
   print('\nfinished.')
 
