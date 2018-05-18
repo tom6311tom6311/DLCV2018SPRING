@@ -10,8 +10,9 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 MODEL = 'vae'
-TEST_DATA_DIR = '../data/test/'
+TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
 OUTPUT_IMG_DIR = 'fig1_4' + '/'
+OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 MODEL_PATH = str(sys.argv[2])
 # ENC_DIM = [4096, 1024, 512]
 ENC_DIM = [(64, 5, 2), (128, 5, 2), (256, 5, 2)]
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     util.save_image(decoded_imgs[i,:], OUTPUT_IMG_DIR + 'dec_' + test_file_names[i], isFlattened=False)
     img_paths.append(OUTPUT_IMG_DIR + 'dec_' + test_file_names[i])
     util.progress(i+1, decoded_imgs.shape[0])
-  util.combine_images(64*8, 64*4, img_paths, 'fig1_4.jpg')
+  util.combine_images(64*8, 64*4, img_paths, OUT_DIR + 'fig1_4.jpg')
   
   print('\nfinished.')
 

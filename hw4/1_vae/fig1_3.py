@@ -10,8 +10,9 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 MODEL = 'vae'
-TEST_DATA_DIR = '../data/test/'
+TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
 OUTPUT_IMG_DIR = 'fig1_3' + '/'
+OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 MODEL_PATH = str(sys.argv[2])
 # ENC_DIM = [4096, 1024, 512]
 ENC_DIM = [(64, 5, 2), (128, 5, 2), (256, 5, 2)]
@@ -29,6 +30,12 @@ if __name__ == '__main__':
   else:
     shutil.rmtree(OUTPUT_IMG_DIR)
     os.makedirs(OUTPUT_IMG_DIR)
+
+  if not os.path.exists(OUT_DIR):
+    os.makedirs(OUT_DIR)
+  else:
+    shutil.rmtree(OUT_DIR)
+    os.makedirs(OUT_DIR)
 
   print('\nLoading testing data...')
   test_data, test_file_names = util.load_data(TEST_DATA_DIR, flatten=False, num=10)
@@ -58,7 +65,7 @@ if __name__ == '__main__':
     ori_paths.append(OUTPUT_IMG_DIR + 'ori_' + test_file_names[i])
     dec_paths.append(OUTPUT_IMG_DIR + 'dec_' + test_file_names[i])
     util.progress(i+1, decoded_imgs.shape[0])
-  util.combine_images(64*10, 64*2, ori_paths + dec_paths, 'fig1_3.jpg')
+  util.combine_images(64*10, 64*2, ori_paths + dec_paths, OUT_DIR + 'fig1_3.jpg')
   
   print('\nfinished.')
 

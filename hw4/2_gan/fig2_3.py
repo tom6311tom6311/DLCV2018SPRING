@@ -10,9 +10,10 @@ from keras.backend.tensorflow_backend import set_session
 import numpy as np
 
 MODEL = 'dcgan'
-TEST_DATA_DIR = '../data/test/'
-TEST_LABEL_PATH = '../data/test.csv'
+TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
+TEST_LABEL_PATH = TEST_DATA_DIR + 'test.csv'
 OUTPUT_IMG_DIR = 'fig2_3' + '/'
+OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 MODEL_PATH = str(sys.argv[2])
 DISCRIM_DIMS = [(128, 5, 2), (256, 5, 2), (512, 5, 2)]
 GEN_DIMS = [(512, 5, 2), (256, 5, 2), (128, 5, 2)]
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     util.save_image(generated_images[i], OUTPUT_IMG_DIR + 'gen_' + test_file_names[i], isFlattened=False)
     img_paths.append(OUTPUT_IMG_DIR + 'gen_' + test_file_names[i])
     util.progress(i+1, 32)
-  util.combine_images(64*8, 64*4, img_paths, 'fig2_3.jpg')
+  util.combine_images(64*8, 64*4, img_paths, OUT_DIR + 'fig2_3.jpg')
   
   print('\nfinished.')
 
