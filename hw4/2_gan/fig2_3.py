@@ -12,6 +12,7 @@ import numpy as np
 MODEL = 'dcgan'
 TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
 TEST_LABEL_PATH = TEST_DATA_DIR + 'test.csv'
+TEST_DATA_DIR = TEST_DATA_DIR + 'test/'
 OUTPUT_IMG_DIR = 'fig2_3' + '/'
 OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 MODEL_PATH = str(sys.argv[2])

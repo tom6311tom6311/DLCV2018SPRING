@@ -10,8 +10,9 @@ from keras.backend.tensorflow_backend import set_session
 import numpy as np
 
 MODEL = 'acgan'
-TEST_DATA_DIR = '../data/test/'
-TEST_LABEL_PATH = '../data/test.csv'
+TEST_DATA_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
+TEST_LABEL_PATH = TEST_DATA_DIR + 'test.csv'
+TEST_DATA_DIR = TEST_DATA_DIR + 'test/'
 OUTPUT_IMG_DIR = 'fig3_3' + '/'
 MODEL_PATH = str(sys.argv[2])
 DISCRIM_DIMS = [(128, 5, 2), (256, 5, 2), (512, 5, 2)]
