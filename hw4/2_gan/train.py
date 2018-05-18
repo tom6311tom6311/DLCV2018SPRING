@@ -8,7 +8,7 @@ import util
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
-MODEL = 'acgan'
+MODEL = 'dcgan'
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
 TRAIN_LABEL_PATH = '../data/train.csv'
@@ -19,7 +19,7 @@ OUTPUT_IMG_DIR = 'img_' + MODEL + '/'
 DISCRIM_DIMS = [(128, 5, 2), (256, 5, 2), (512, 5, 2)]
 GEN_DIMS = [(512, 5, 2), (256, 5, 2), (128, 5, 2)]
 LATENT_DIM = 100
-MAX_EPOCHS = 1000
+MAX_EPOCHS = 25
 BATCH_SIZE = 64
 CHK_POINT_INTERVAL = 5
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
   print('\ntraining...')
   gan.train(
     train_data,
-    train_labels,
+    # train_labels,
     epochs=MAX_EPOCHS,
     batch_size=BATCH_SIZE,
     chk_point_interval=CHK_POINT_INTERVAL,
