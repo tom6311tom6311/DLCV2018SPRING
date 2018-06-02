@@ -1,10 +1,13 @@
 import sys
+import os
+import shutil
 import reader
 import numpy as np
 from keras.applications.resnet50 import ResNet50
 from keras.applications.resnet50 import preprocess_input
 
 VIDEO_PATH = 'data/TrimmedVideos/'
+FEAT_FILE_DIR = VIDEO_PATH + 'feat/'
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -14,7 +17,7 @@ def progress(count, total, suffix=''):
   sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
   sys.stdout.flush()
 
-def load_feats(is_train=True):
+def extract_feats(is_train=True):
   mode = 'train' if is_train else 'valid'
   video_list = reader.getVideoList(VIDEO_PATH + 'label/gt_' + mode + '.csv')
   all_frames = []
@@ -31,5 +34,13 @@ def load_feats(is_train=True):
 
   feat_extractor = ResNet50(weights='imagenet', input_shape=all_frames.shape[1:])
   all_feats = feat_extractor.predict(all_frames, verbose=1)
-  print(feats.shape)
-  return all_feats, all_labels
+  print(all_feats.shape)
+  np.savez(FEAT_FILE_DIR + mode + '.npy', feats=all_feats, labels=all_labels)
+
+def main():
+  if not os.path.exists(FEAT_FILE_DIR):
+    os.makedirs(FEAT_FILE_DIR)
+  extract_feats(True)
+
+if __name__ == '__main__':
+  main()
