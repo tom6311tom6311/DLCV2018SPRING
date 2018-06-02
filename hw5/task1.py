@@ -23,7 +23,8 @@ print(train_feats.shape)
 print(train_labels.shape)
 
 classifier = Sequential()
-classifier.add(Dense(11, input_shape=(train_feats.shape[1],), activation='softmax'))
+classifier.add(Dense(256, input_shape=(train_feats.shape[1],), activation='relu'))
+classifier.add(Dense(11, activation='softmax'))
 classifier.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-classifier.fit(train_feats, train_labels, validation_data=(valid_feats, valid_labels), epochs=100, batch_size=32, callbacks=[EarlyStopping(monitor='val_loss', patience=3, verbose=1, mode='auto')])
+classifier.fit(train_feats, train_labels, validation_data=(valid_feats, valid_labels), epochs=100, batch_size=32, callbacks=[EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')])
