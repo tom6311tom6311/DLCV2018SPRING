@@ -11,11 +11,6 @@ from keras.backend.tensorflow_backend import set_session
 VIDEO_PATH = 'data/TrimmedVideos/'
 FEAT_FILE_DIR = VIDEO_PATH + 'feat/'
 
-os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.8
-set_session(tf.Session(config=config))
-
 def progress(count, total, suffix=''):
   bar_len = 60
   filled_len = int(round(bar_len * count / float(total)))
@@ -42,9 +37,21 @@ def extract_feats(is_train=True):
   feat_extractor = ResNet50(weights='imagenet', input_shape=all_frames.shape[1:])
   all_feats = feat_extractor.predict(all_frames, verbose=1)
   print(all_feats.shape)
-  np.savez(FEAT_FILE_DIR + mode + '.npy', feats=all_feats, labels=all_labels)
+  np.savez(FEAT_FILE_DIR + mode, feats=all_feats, labels=all_labels)
+
+def load_feats_and_labels(is_train=True):
+  mode = 'train' if is_train else 'valid'
+  raw = np.load(FEAT_FILE_DIR + mode + '.npz')
+  all_feats = raw['feats']
+  all_labels = raw['labels']
+  return all_feats, all_labels
 
 def main():
+  os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
+  config = tf.ConfigProto()
+  config.gpu_options.per_process_gpu_memory_fraction = 0.8
+  set_session(tf.Session(config=config))
+
   if not os.path.exists(FEAT_FILE_DIR):
     os.makedirs(FEAT_FILE_DIR)
   extract_feats(True)
