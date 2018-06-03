@@ -29,7 +29,7 @@ def readShortVideo(video_path, video_category, video_name, downsample_factor=12,
         else:
             continue
 
-    return frames #np.array(frames).astype(np.float64)
+    return np.array(frames).astype(np.float64)
 
 
 def getVideoList(data_path):
