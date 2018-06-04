@@ -5,8 +5,9 @@ import numpy as np
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, Conv1D, Flatten
 from keras.callbacks import EarlyStopping
+from keras import regularizers
 
 ENABLE_EARLY_STOP = False
 
@@ -25,7 +26,15 @@ print(train_feats.shape)
 print(train_labels.shape)
 
 classifier = Sequential()
-classifier.add(Dense(256, input_shape=(train_feats.shape[1],), activation='relu'))
+classifier.add(Conv1D(32, 2, padding='same', strides=2, activation='relu', input_shape=(4, 1000)))
+classifier.add(Dropout(0.3))
+classifier.add(Conv1D(32, 2, padding='same', strides=2, activation='relu'))
+classifier.add(Dropout(0.3))
+classifier.add(Flatten())
+# classifier.add(Dense(32, input_shape=(train_feats.shape[1],), activation='relu', kernel_regularizer=regularizers.l2(0.0005)))
+# classifier.add(Dropout(0.3))
+# classifier.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.0005)))
+# classifier.add(Dropout(0.3))
 classifier.add(Dense(11, activation='softmax'))
 classifier.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 

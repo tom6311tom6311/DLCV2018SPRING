@@ -39,7 +39,7 @@ def extract_feats(is_train=True, concat_frames=True):
     for idx, frames in enumerate(all_frames):
       selected_frame_idxs = [int((len(frames) - 1) / 3 * i) for i in range(4)]
       selected_frames = preprocess_input(frames[selected_frame_idxs,:])
-      selected_feats = feat_extractor.predict(selected_frames).reshape((1000 * 4,))
+      selected_feats = feat_extractor.predict(selected_frames) #.reshape((1000 * 4,))
       all_feats.append(selected_feats)
       progress(idx+1, len(all_frames))
     all_feats = np.array(all_feats)
