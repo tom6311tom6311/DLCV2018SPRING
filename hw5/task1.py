@@ -26,7 +26,7 @@ print(train_feats.shape)
 print(train_labels.shape)
 
 classifier = Sequential()
-classifier.add(Conv1D(32, 2, padding='same', strides=2, activation='relu', input_shape=(4, 1000)))
+classifier.add(Conv1D(32, 2, padding='same', strides=2, activation='relu', input_shape=train_feats.shape[1:]))
 classifier.add(Dropout(0.3))
 classifier.add(Conv1D(32, 2, padding='same', strides=2, activation='relu'))
 classifier.add(Dropout(0.3))

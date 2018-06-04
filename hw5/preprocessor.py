@@ -7,8 +7,9 @@ from keras.applications.resnet50 import ResNet50, preprocess_input
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
+NUM_FRAMES_EACH_VIDEO = 6
 VIDEO_PATH = 'data/TrimmedVideos/'
-FEAT_FILE_DIR = VIDEO_PATH + 'feat/'
+FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '/'
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -37,7 +38,7 @@ def extract_feats(is_train=True, concat_frames=True):
     print('\nextracting features...')
     all_feats = []
     for idx, frames in enumerate(all_frames):
-      selected_frame_idxs = [int((len(frames) - 1) / 3 * i) for i in range(4)]
+      selected_frame_idxs = [int((len(frames) - 1) / (NUM_FRAMES_EACH_VIDEO - 1) * i) for i in range(NUM_FRAMES_EACH_VIDEO)]
       selected_frames = preprocess_input(frames[selected_frame_idxs,:])
       selected_feats = feat_extractor.predict(selected_frames) #.reshape((1000 * 4,))
       all_feats.append(selected_feats)
