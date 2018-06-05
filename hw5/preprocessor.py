@@ -3,13 +3,15 @@ import os
 import shutil
 import reader
 import numpy as np
+from keras.models import Model
 from keras.applications.resnet50 import ResNet50, preprocess_input
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
+from keras.layers import Flatten
 
 NUM_FRAMES_EACH_VIDEO = 6
 VIDEO_PATH = 'data/TrimmedVideos/'
-FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '/'
+FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '_2048/'
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -25,7 +27,10 @@ def extract_feats(is_train=True, concat_frames=True):
   all_frames = []
   all_labels = []
 
-  feat_extractor = ResNet50(weights='imagenet', input_shape=(224,224,3))
+  feat_extractor = ResNet50(weights='imagenet', include_top=False, input_shape=(224,224,3))
+  output = feat_extractor.get_layer('avg_pool').output
+  output = Flatten()(output)
+  feat_extractor = Model(feat_extractor.input, output)
 
   if (concat_frames):
     print('loading videos...')
