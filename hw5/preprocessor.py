@@ -10,8 +10,9 @@ from keras.backend.tensorflow_backend import set_session
 from keras.layers import Flatten
 
 NUM_FRAMES_EACH_VIDEO = 6
+ZERO_PADDING = True
 VIDEO_PATH = 'data/TrimmedVideos/'
-FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '_2048/'
+FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '_2048_' + str(ZERO_PADDING) + '/'
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -21,7 +22,7 @@ def progress(count, total, suffix=''):
   sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
   sys.stdout.flush()
 
-def extract_feats(is_train=True, concat_frames=True):
+def extract_feats(is_train=True, concat_frames=True, zero_padding=False):
   mode = 'train' if is_train else 'valid'
   video_list = reader.getVideoList(VIDEO_PATH + 'label/gt_' + mode + '.csv')
   all_frames = []
@@ -43,7 +44,12 @@ def extract_feats(is_train=True, concat_frames=True):
     print('\nextracting features...')
     all_feats = []
     for idx, frames in enumerate(all_frames):
-      selected_frame_idxs = [int((len(frames) - 1) / (NUM_FRAMES_EACH_VIDEO - 1) * i) for i in range(NUM_FRAMES_EACH_VIDEO)]
+      if (zero_padding):
+        if (frames.shape[0] < NUM_FRAMES_EACH_VIDEO):
+          frames = np.concatenate([frames, np.zeros((NUM_FRAMES_EACH_VIDEO - frames.shape[0],) + frames.shape[1:])])
+        selected_frame_idxs = list(range(NUM_FRAMES_EACH_VIDEO))
+      else:
+        selected_frame_idxs = [int((len(frames) - 1) / (NUM_FRAMES_EACH_VIDEO - 1) * i) for i in range(NUM_FRAMES_EACH_VIDEO)]
       selected_frames = preprocess_input(frames[selected_frame_idxs,:])
       selected_feats = feat_extractor.predict(selected_frames) #.reshape((1000 * 4,))
       all_feats.append(selected_feats)
@@ -85,7 +91,7 @@ def main():
 
   if not os.path.exists(FEAT_FILE_DIR):
     os.makedirs(FEAT_FILE_DIR)
-  extract_feats(False)
+  extract_feats(False, zero_padding=True)
 
 if __name__ == '__main__':
   main()
