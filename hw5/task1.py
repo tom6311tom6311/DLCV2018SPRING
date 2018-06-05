@@ -16,10 +16,12 @@ config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
-train_feats, train_labels = preprocessor.load_feats_and_labels(True)
+FEAT_FILE_DIR = str(sys.argv[2]) if str(sys.argv[2])[-1] == '/' else str(sys.argv[2]) + '/'
+
+train_feats, train_labels = preprocessor.load_feats_and_labels(True, FEAT_FILE_DIR)
 train_labels = np.eye(11)[train_labels.astype(np.uint8)]
 
-valid_feats, valid_labels = preprocessor.load_feats_and_labels(False)
+valid_feats, valid_labels = preprocessor.load_feats_and_labels(False, FEAT_FILE_DIR)
 valid_labels = np.eye(11)[valid_labels.astype(np.uint8)]
 
 print(train_feats.shape)
