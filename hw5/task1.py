@@ -6,7 +6,7 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Conv1D, Flatten
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, TensorBoard
 from keras import regularizers
 
 ENABLE_EARLY_STOP = False
@@ -17,6 +17,14 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
 FEAT_FILE_DIR = str(sys.argv[2]) if str(sys.argv[2])[-1] == '/' else str(sys.argv[2]) + '/'
+TASK1_LOG_DIR = 'log_task1/'
+LOG_SUB_DIR = TASK1_LOG_DIR + FEAT_FILE_DIR.split('/')[-2] + '/'
+
+if not os.path.exists(TASK1_LOG_DIR):
+  os.makedirs(TASK1_LOG_DIR)
+if not os.path.exists(LOG_SUB_DIR):
+  os.makedirs(LOG_SUB_DIR)
+
 
 train_feats, train_labels = preprocessor.load_feats_and_labels(True, FEAT_FILE_DIR)
 train_labels = np.eye(11)[train_labels.astype(np.uint8)]
@@ -41,5 +49,9 @@ classifier.add(Dense(11, activation='softmax'))
 classifier.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
-callbacks = [EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto')] if ENABLE_EARLY_STOP else []
+callbacks = []
+if ENABLE_EARLY_STOP:
+  callbacks.append(EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto'))
+callbacks.append(TensorBoard(log_dir=LOG_SUB_DIR))
+
 classifier.fit(train_feats, train_labels, validation_data=(valid_feats, valid_labels), epochs=100, batch_size=32, callbacks=callbacks)
