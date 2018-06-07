@@ -9,28 +9,28 @@ from keras.layers import Dense, Dropout, Conv1D, Flatten, LSTM, Bidirectional
 from keras.callbacks import EarlyStopping, TensorBoard
 from keras import regularizers
 
-
 ENABLE_EARLY_STOP = False
-FEAT_FILE_DIR = str(sys.argv[2]) if str(sys.argv[2])[-1] == '/' else str(sys.argv[2]) + '/'
-TASK2_LOG_DIR = 'log_task2/'
-LOG_SUB_DIR = TASK2_LOG_DIR + FEAT_FILE_DIR.split('/')[-2] + '/'
-
-
-if not os.path.exists(TASK2_LOG_DIR):
-  os.makedirs(TASK2_LOG_DIR)
-if not os.path.exists(LOG_SUB_DIR):
-  os.makedirs(LOG_SUB_DIR)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
-train_feats, train_labels = preprocessor.load_feats_and_labels(True, FEAT_FILE_DIR)
-train_labels = np.eye(11)[train_labels.astype(np.uint8)]
+TRAIN_FEAT_PATH = str(sys.argv[2])
+VALID_FEAT_PATH = str(sys.argv[3])
+TASK2_LOG_DIR = 'log_task2/'
+LOG_SUB_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 
-valid_feats, valid_labels = preprocessor.load_feats_and_labels(False, FEAT_FILE_DIR)
-valid_labels = np.eye(11)[valid_labels.astype(np.uint8)]
+if not os.path.exists(TASK2_LOG_DIR):
+  os.makedirs(TASK2_LOG_DIR)
+if not os.path.exists(LOG_SUB_DIR):
+  os.makedirs(LOG_SUB_DIR)
+
+train_feats, train_labels = preprocessor.load_feats_and_labels(TRAIN_FEAT_PATH)
+train_labels = np.eye(11)[train_labels]
+
+valid_feats, valid_labels = preprocessor.load_feats_and_labels(VALID_FEAT_PATH)
+valid_labels = np.eye(11)[valid_labels]
 
 print(train_feats.shape)
 print(train_labels.shape)
@@ -51,3 +51,5 @@ if ENABLE_EARLY_STOP:
 callbacks.append(TensorBoard(log_dir=LOG_SUB_DIR))
 
 classifier.fit(train_feats, train_labels, validation_data=(valid_feats, valid_labels), epochs=100, batch_size=32, callbacks=callbacks)
+classifier.save(LOG_SUB_DIR + 'model.hdf5', overwrite=True, include_optimizer=False)
+print('Model saved.')

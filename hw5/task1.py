@@ -16,9 +16,10 @@ config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
-FEAT_FILE_DIR = str(sys.argv[2]) if str(sys.argv[2])[-1] == '/' else str(sys.argv[2]) + '/'
+TRAIN_FEAT_PATH = str(sys.argv[2])
+VALID_FEAT_PATH = str(sys.argv[3])
 TASK1_LOG_DIR = 'log_task1/'
-LOG_SUB_DIR = TASK1_LOG_DIR + FEAT_FILE_DIR.split('/')[-2] + '/'
+LOG_SUB_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 
 if not os.path.exists(TASK1_LOG_DIR):
   os.makedirs(TASK1_LOG_DIR)
@@ -26,10 +27,10 @@ if not os.path.exists(LOG_SUB_DIR):
   os.makedirs(LOG_SUB_DIR)
 
 
-train_feats, train_labels = preprocessor.load_feats_and_labels(True, FEAT_FILE_DIR)
+train_feats, train_labels = preprocessor.load_feats_and_labels(TRAIN_FEAT_PATH)
 train_labels = np.eye(11)[train_labels]
 
-valid_feats, valid_labels = preprocessor.load_feats_and_labels(False, FEAT_FILE_DIR)
+valid_feats, valid_labels = preprocessor.load_feats_and_labels(VALID_FEAT_PATH)
 valid_labels = np.eye(11)[valid_labels]
 
 print(train_feats.shape)
