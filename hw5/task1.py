@@ -9,7 +9,7 @@ from keras.layers import Dense, Dropout, Conv1D, Flatten
 from keras.callbacks import EarlyStopping, TensorBoard
 from keras import regularizers
 
-ENABLE_EARLY_STOP = False
+ENABLE_EARLY_STOP = True
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
@@ -27,10 +27,10 @@ if not os.path.exists(LOG_SUB_DIR):
 
 
 train_feats, train_labels = preprocessor.load_feats_and_labels(True, FEAT_FILE_DIR)
-train_labels = np.eye(11)[train_labels.astype(np.uint8)]
+train_labels = np.eye(11)[train_labels]
 
 valid_feats, valid_labels = preprocessor.load_feats_and_labels(False, FEAT_FILE_DIR)
-valid_labels = np.eye(11)[valid_labels.astype(np.uint8)]
+valid_labels = np.eye(11)[valid_labels]
 
 print(train_feats.shape)
 print(train_labels.shape)
@@ -55,3 +55,5 @@ if ENABLE_EARLY_STOP:
 callbacks.append(TensorBoard(log_dir=LOG_SUB_DIR))
 
 classifier.fit(train_feats, train_labels, validation_data=(valid_feats, valid_labels), epochs=100, batch_size=32, callbacks=callbacks)
+classifier.save(LOG_SUB_DIR + 'model.hdf5', overwrite=True, include_optimizer=False)
+print('Model saved.')

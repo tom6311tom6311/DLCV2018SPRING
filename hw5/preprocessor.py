@@ -78,7 +78,7 @@ def load_feats_and_labels(is_train=True, feat_file_dir=VIDEO_PATH + 'feat/'):
   raw = np.load(feat_file_dir + mode + '.npz')
   all_feats = raw['feats']
   all_labels = raw['labels']
-  return all_feats, all_labels
+  return all_feats, all_labels.astype(np.uint8)
 
 def main():
   os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
@@ -99,6 +99,12 @@ def main():
     os.makedirs(FEAT_FILE_DIR)
 
   extract_feats(IS_TRAIN, num_frames_each_video=NUM_FRAMES_EACH_VIDEO, zero_padding=ZERO_PADDING, feat_file_dir=FEAT_FILE_DIR)
+
+def write_predict_file(predicted, file_path):
+  with open(file_path, 'w') as f:
+    for p in predicted:
+      f.write(str(int(p)) + '\n')
+    f.close()
 
 if __name__ == '__main__':
   main()
