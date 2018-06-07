@@ -9,7 +9,7 @@ from keras.layers import Dense, Dropout, Conv1D, Flatten, LSTM, Bidirectional
 from keras.callbacks import EarlyStopping, TensorBoard
 from keras import regularizers
 
-ENABLE_EARLY_STOP = False
+ENABLE_EARLY_STOP = True
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
 config = tf.ConfigProto()
@@ -38,8 +38,8 @@ print(train_labels.shape)
 classifier = Sequential()
 # classifier.add(LSTM(8, return_sequences=True, dropout=0.3, input_shape=train_feats.shape[1:]))
 # classifier.add(LSTM(8, dropout=0.3))
-classifier.add(Bidirectional(LSTM(64, return_sequences=True, dropout=0.3), input_shape=train_feats.shape[1:]))
-classifier.add(Bidirectional(LSTM(64, dropout=0.3)))
+classifier.add(Bidirectional(LSTM(32, return_sequences=True, dropout=0.3), input_shape=train_feats.shape[1:]))
+classifier.add(Bidirectional(LSTM(32, dropout=0.3)))
 # classifier.add(Dense(128, activation='relu'))
 classifier.add(Dense(11, activation='softmax'))
 classifier.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
