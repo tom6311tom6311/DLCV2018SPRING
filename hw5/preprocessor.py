@@ -9,7 +9,6 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.layers import Flatten
 
-VIDEO_PATH = 'data/TrimmedVideos/'
 
 def progress(count, total, suffix=''):
   bar_len = 60
@@ -19,9 +18,8 @@ def progress(count, total, suffix=''):
   sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
   sys.stdout.flush()
 
-def extract_feats(is_train=True, num_frames_each_video=6, concat_frames=True, zero_padding=False, feat_file_dir=VIDEO_PATH + 'feat/'):
-  mode = 'train' if is_train else 'valid'
-  video_list = reader.getVideoList(VIDEO_PATH + 'label/gt_' + mode + '.csv')
+def extract_feats(video_path, label_path, out_path, num_frames_each_video=6, concat_frames=True, zero_padding=False):
+  video_list = reader.getVideoList(label_path)
   all_frames = []
   all_labels = []
 
@@ -33,7 +31,7 @@ def extract_feats(is_train=True, num_frames_each_video=6, concat_frames=True, ze
   if (concat_frames):
     print('loading videos...')
     for idx in range(len(video_list['Video_index'])):
-      frames = reader.readShortVideo(VIDEO_PATH + 'video/' + mode, video_list['Video_category'][idx], video_list['Video_name'][idx])
+      frames = reader.readShortVideo(video_path, video_list['Video_category'][idx], video_list['Video_name'][idx])
       all_frames.append(frames)
       all_labels.append(video_list['Action_labels'][idx]) #+ [video_list['Action_labels'][idx]] * len(frames)
       progress(idx+1, len(video_list['Video_index']))
@@ -55,11 +53,11 @@ def extract_feats(is_train=True, num_frames_each_video=6, concat_frames=True, ze
     all_labels = np.array(all_labels)
     print(all_feats.shape)
     print(all_labels.shape)
-    np.savez(feat_file_dir + mode, feats=all_feats, labels=all_labels)
+    np.savez(out_path, feats=all_feats, labels=all_labels)
 
   else:
     for idx in range(len(video_list['Video_index'])):
-      frames = reader.readShortVideo(VIDEO_PATH + 'video/' + mode, video_list['Video_category'][idx], video_list['Video_name'][idx])
+      frames = reader.readShortVideo(video_path, video_list['Video_category'][idx], video_list['Video_name'][idx])
       all_frames = all_frames + frames
       all_labels = all_labels + [video_list['Action_labels'][idx]] * len(frames)
       progress(idx+1, len(video_list['Video_index']))
@@ -71,14 +69,19 @@ def extract_feats(is_train=True, num_frames_each_video=6, concat_frames=True, ze
     all_feats = feat_extractor.predict(all_frames, verbose=1)
     print(all_feats.shape)
     print(all_labels.shape)
-    np.savez(feat_file_dir + mode, feats=all_feats, labels=all_labels)
+    np.savez(out_path, feats=all_feats, labels=all_labels)
 
-def load_feats_and_labels(is_train=True, feat_file_dir=VIDEO_PATH + 'feat/'):
-  mode = 'train' if is_train else 'valid'
-  raw = np.load(feat_file_dir + mode + '.npz')
+def load_feats_and_labels(feat_path):
+  raw = np.load(feat_path + '.npz')
   all_feats = raw['feats']
   all_labels = raw['labels']
   return all_feats, all_labels.astype(np.uint8)
+
+def write_predict_file(predicted, file_path):
+  with open(file_path, 'w') as f:
+    for p in predicted:
+      f.write(str(int(p)) + '\n')
+    f.close()
 
 def main():
   os.environ["CUDA_VISIBLE_DEVICES"] = str(sys.argv[1])
@@ -87,24 +90,15 @@ def main():
   set_session(tf.Session(config=config))
 
   NUM_FRAMES_EACH_VIDEO = int(sys.argv[2])
-  IS_TRAIN = True if str(sys.argv[3]) == 'True' else False
-  ZERO_PADDING = True if str(sys.argv[4]) == 'True' else False
-  FEAT_FILE_DIR = VIDEO_PATH + 'feat' + str(NUM_FRAMES_EACH_VIDEO) + '_2048_' + str(ZERO_PADDING) + '/'
+  ZERO_PADDING = True if str(sys.argv[3]) == 'True' else False
+  VIDEO_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+  LABEL_PATH = str(sys.argv[5])
+  OUT_PATH = str(sys.argv[6])
 
   print(NUM_FRAMES_EACH_VIDEO)
-  print(IS_TRAIN)
   print(ZERO_PADDING)
 
-  if not os.path.exists(FEAT_FILE_DIR):
-    os.makedirs(FEAT_FILE_DIR)
-
-  extract_feats(IS_TRAIN, num_frames_each_video=NUM_FRAMES_EACH_VIDEO, zero_padding=ZERO_PADDING, feat_file_dir=FEAT_FILE_DIR)
-
-def write_predict_file(predicted, file_path):
-  with open(file_path, 'w') as f:
-    for p in predicted:
-      f.write(str(int(p)) + '\n')
-    f.close()
+  extract_feats(VIDEO_DIR, LABEL_PATH, OUT_PATH, NUM_FRAMES_EACH_VIDEO)
 
 if __name__ == '__main__':
   main()
