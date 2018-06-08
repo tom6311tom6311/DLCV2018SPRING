@@ -112,7 +112,7 @@ def slice_feats(feats, labels, num_frames_each_sample):
     sliced_feats.append(feats[idx:idx+10, :])
     sliced_labels.append(np.argmax(np.bincount(labels[idx:idx+10])))
   sliced_feats = np.array(sliced_feats)
-  sliced_labels = np.arry(sliced_labels)
+  sliced_labels = np.array(sliced_labels)
   return sliced_feats, sliced_labels
 
 def write_predict_file(predicted, file_path):
