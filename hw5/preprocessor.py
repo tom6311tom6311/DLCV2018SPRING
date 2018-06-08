@@ -73,7 +73,7 @@ def extract_feats(video_path, label_path, out_path, num_frames_each_video=6, con
     print(all_labels.shape)
     np.savez(out_path, feats=all_feats, labels=all_labels)
 
-def extract_full_length_feats(video_dir, label_path):
+def extract_full_length_feats(video_dir):
   feat_extractor = ResNet50(weights='imagenet', include_top=False, input_shape=(224,224,3))
   output = feat_extractor.get_layer('avg_pool').output
   output = Flatten()(output)
@@ -85,10 +85,10 @@ def extract_full_length_feats(video_dir, label_path):
   all_frames = [io.imread(video_dir + fn) for fn in images]
   all_frames = [skimage.transform.resize(frame, (224,224,3), mode='constant', preserve_range=True, anti_aliasing=True).astype(np.float64) for frame in all_frames]
   all_frames = np.array(all_frames).astype(np.float64)
-  with open(label_path, 'r') as label_file:
-    all_labels = label_file.readlines()
-    label_file.close()
-  all_labels = np.array([int(l) for l in all_labels])
+  # with open(label_path, 'r') as label_file:
+  #   all_labels = label_file.readlines()
+  #   label_file.close()
+  # all_labels = np.array([int(l) for l in all_labels])
 
   print('\nextracting features...')
   all_feats = []
@@ -96,8 +96,7 @@ def extract_full_length_feats(video_dir, label_path):
   all_feats = feat_extractor.predict(all_frames, verbose=1)
 
   print(all_feats.shape)
-  print(all_labels.shape)
-  return all_feats, all_labels
+  return all_feats
 
 def load_feats_and_labels(feat_path):
   raw = np.load(feat_path + '.npz')
@@ -105,20 +104,19 @@ def load_feats_and_labels(feat_path):
   all_labels = raw['labels']
   return all_feats, all_labels.astype(np.uint8)
 
-def slice_feats(feats, labels, num_frames_each_sample):
+def slice_feats(feats, num_frames_each_sample):
   sliced_feats = []
-  sliced_labels = []
   for idx in range(feats.shape[0] - num_frames_each_sample):
     sliced_feats.append(feats[idx:idx+10, :])
-    sliced_labels.append(np.argmax(np.bincount(labels[idx:idx+10])))
   sliced_feats = np.array(sliced_feats)
-  sliced_labels = np.array(sliced_labels)
-  return sliced_feats, sliced_labels
+  return sliced_feats
 
-def write_predict_file(predicted, file_path):
+def write_predict_file(predicted, file_path, append=0):
   with open(file_path, 'w') as f:
     for p in predicted:
       f.write(str(int(p)) + '\n')
+    for i in range(append):
+      f.write(str(int(predicted[-1])) + '\n')
     f.close()
 
 def main():

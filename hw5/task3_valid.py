@@ -13,20 +13,21 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
 MODEL_PATH = str(sys.argv[2])
-VIDEO_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
-LABEL_PATH = str(sys.argv[4])
-OUT_DIR = str(sys.argv[5]) if str(sys.argv[5])[-1] == '/' else str(sys.argv[5]) + '/'
+VIDEOS_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
+OUT_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
 
 if not os.path.exists(OUT_DIR):
   os.makedirs(OUT_DIR)
 
-valid_feats, valid_labels = preprocessor.extract_full_length_feats(VIDEO_DIR, LABEL_PATH)
-
 classifier = load_model(MODEL_PATH)
 
-sliced_valid_feats, sliced_valid_labels = preprocessor.slice_feats(valid_feats, valid_labels, 10)
-predicted = classifier.predict(sliced_valid_feats)
-predicted = np.argmax(predicted, axis=1)
-print('Accuracy: ' + str(np.sum(np.equal(sliced_valid_labels, predicted)) / predicted.shape[0]))
+videos = os.listdir(VIDEOS_DIR)
+videos.sort()
 
-# preprocessor.write_predict_file(predicted, OUT_DIR + 'p3_valid.txt')
+for i, video in enumerate(videos):
+  valid_feats = preprocessor.extract_full_length_feats(VIDEOS_DIR + video + '/')
+  sliced_valid_feats = preprocessor.slice_feats(valid_feats, 10)
+  predicted = classifier.predict(sliced_valid_feats)
+  predicted = np.argmax(predicted, axis=1)
+  preprocessor.write_predict_file(predicted, OUT_DIR + video + '.txt', append=10)
+  preprocessor.progress(i+1, len(videos))
