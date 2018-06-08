@@ -8,6 +8,8 @@ from keras.applications.resnet50 import ResNet50, preprocess_input
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.layers import Flatten
+import skimage.transform
+import skimage.io as io
 
 
 def progress(count, total, suffix=''):
@@ -71,6 +73,47 @@ def extract_feats(video_path, label_path, out_path, num_frames_each_video=6, con
     print(all_labels.shape)
     np.savez(out_path, feats=all_feats, labels=all_labels)
 
+def extract_full_length_feats(video_dir, label_dir, out_path):
+  print(video_dir)
+  video_names = os.listdir(video_dir)
+  video_names.sort()
+
+  all_frames = []
+  all_labels = []
+
+  feat_extractor = ResNet50(weights='imagenet', include_top=False, input_shape=(224,224,3))
+  output = feat_extractor.get_layer('avg_pool').output
+  output = Flatten()(output)
+  feat_extractor = Model(feat_extractor.input, output)
+
+  print('loading videos...')
+  for idx, video_name in enumerate(video_names):
+    images = os.listdir(video_dir + video_name)
+    images.sort()
+    frames = [io.imread(video_dir + video_name + '/' + fn) for fn in images]
+    frames = [skimage.transform.resize(frame, (224,224,3), mode='constant', preserve_range=True, anti_aliasing=True).astype(np.float64) for frame in frames]
+    frames = np.array(frames).astype(np.float64)
+    all_frames.append(frames)
+    with open(label_dir + video_name + '.txt', 'r') as label_file:
+      labels = label_file.readlines()
+      label_file.close()
+    labels = [int(l) for l in labels]
+    all_labels.append(labels)
+    progress(idx+1, len(video_names))
+
+  print('\nextracting features...')
+  all_feats = []
+  for idx, frames in enumerate(all_frames):
+    frames = preprocess_input(frames)
+    feats = feat_extractor.predict(frames, verbose=1)
+    all_feats.append(feats)
+    progress(idx+1, len(all_frames))
+  # all_feats = np.array(all_feats)
+  # all_labels = np.array(all_labels)
+  print(all_feats[0].shape)
+  print(all_labels[0].shape)
+  np.savez(out_path, feats=all_feats, labels=all_labels)
+
 def load_feats_and_labels(feat_path):
   raw = np.load(feat_path + '.npz')
   all_feats = raw['feats']
@@ -90,15 +133,23 @@ def main():
   set_session(tf.Session(config=config))
 
   NUM_FRAMES_EACH_VIDEO = int(sys.argv[2])
-  ZERO_PADDING = True if str(sys.argv[3]) == 'True' else False
-  VIDEO_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
-  LABEL_PATH = str(sys.argv[5])
-  OUT_PATH = str(sys.argv[6])
 
-  print(NUM_FRAMES_EACH_VIDEO)
-  print(ZERO_PADDING)
+  if (NUM_FRAMES_EACH_VIDEO == -1):
+    VIDEO_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
+    LABEL_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+    OUT_PATH = str(sys.argv[5])
 
-  extract_feats(VIDEO_DIR, LABEL_PATH, OUT_PATH, NUM_FRAMES_EACH_VIDEO)
+    extract_full_length_feats(VIDEO_DIR, LABEL_DIR, OUT_PATH)
+  else:
+    ZERO_PADDING = True if str(sys.argv[3]) == 'True' else False
+    VIDEO_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+    LABEL_PATH = str(sys.argv[5])
+    OUT_PATH = str(sys.argv[6])
+
+    print(NUM_FRAMES_EACH_VIDEO)
+    print(ZERO_PADDING)
+
+    extract_feats(VIDEO_DIR, LABEL_PATH, OUT_PATH, NUM_FRAMES_EACH_VIDEO)
 
 if __name__ == '__main__':
   main()
