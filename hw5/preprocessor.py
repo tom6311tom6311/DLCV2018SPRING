@@ -73,52 +73,47 @@ def extract_feats(video_path, label_path, out_path, num_frames_each_video=6, con
     print(all_labels.shape)
     np.savez(out_path, feats=all_feats, labels=all_labels)
 
-def extract_full_length_feats(video_dir, label_dir, out_path):
-  print(video_dir)
-  video_names = os.listdir(video_dir)
-  video_names.sort()
-
-  all_frames = []
-  all_labels = []
-
+def extract_full_length_feats(video_dir, label_path):
   feat_extractor = ResNet50(weights='imagenet', include_top=False, input_shape=(224,224,3))
   output = feat_extractor.get_layer('avg_pool').output
   output = Flatten()(output)
   feat_extractor = Model(feat_extractor.input, output)
 
-  print('loading videos...')
-  for idx, video_name in enumerate(video_names):
-    images = os.listdir(video_dir + video_name)
-    images.sort()
-    frames = [io.imread(video_dir + video_name + '/' + fn) for fn in images]
-    frames = [skimage.transform.resize(frame, (224,224,3), mode='constant', preserve_range=True, anti_aliasing=True).astype(np.float64) for frame in frames]
-    frames = np.array(frames).astype(np.float64)
-    all_frames.append(frames)
-    with open(label_dir + video_name + '.txt', 'r') as label_file:
-      labels = label_file.readlines()
-      label_file.close()
-    labels = [int(l) for l in labels]
-    all_labels.append(labels)
-    progress(idx+1, len(video_names))
+  print('loading video...')
+  images = os.listdir(video_dir)
+  images.sort()
+  all_frames = [io.imread(video_dir + fn) for fn in images]
+  all_frames = [skimage.transform.resize(frame, (224,224,3), mode='constant', preserve_range=True, anti_aliasing=True).astype(np.float64) for frame in all_frames]
+  all_frames = np.array(all_frames).astype(np.float64)
+  with open(label_path, 'r') as label_file:
+    all_labels = label_file.readlines()
+    label_file.close()
+  all_labels = np.array([int(l) for l in all_labels])
 
   print('\nextracting features...')
   all_feats = []
-  for idx, frames in enumerate(all_frames):
-    frames = preprocess_input(frames)
-    feats = feat_extractor.predict(frames, verbose=1)
-    all_feats.append(feats)
-    progress(idx+1, len(all_frames))
-  # all_feats = np.array(all_feats)
-  # all_labels = np.array(all_labels)
-  print(all_feats[0].shape)
-  print(all_labels[0].shape)
-  np.savez(out_path, feats=all_feats, labels=all_labels)
+  all_frames = preprocess_input(all_frames)
+  all_feats = feat_extractor.predict(all_frames, verbose=1)
+
+  print(all_feats.shape)
+  print(all_labels.shape)
+  return all_feats, all_labels
 
 def load_feats_and_labels(feat_path):
   raw = np.load(feat_path + '.npz')
   all_feats = raw['feats']
   all_labels = raw['labels']
   return all_feats, all_labels.astype(np.uint8)
+
+def slice_feats(feats, labels, num_frames_each_sample):
+  sliced_feats = []
+  sliced_labels = []
+  for idx in range(feats.shape[0] - num_frames_each_sample):
+    sliced_feats.append(feats[idx:idx+10, :])
+    sliced_labels.append(np.argmax(np.bincount(labels[idx:idx+10])))
+  sliced_feats = np.array(sliced_feats)
+  sliced_labels = np.arry(sliced_labels)
+  return sliced_feats, sliced_labels
 
 def write_predict_file(predicted, file_path):
   with open(file_path, 'w') as f:
@@ -133,23 +128,15 @@ def main():
   set_session(tf.Session(config=config))
 
   NUM_FRAMES_EACH_VIDEO = int(sys.argv[2])
+  ZERO_PADDING = True if str(sys.argv[3]) == 'True' else False
+  VIDEO_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
+  LABEL_PATH = str(sys.argv[5])
+  OUT_PATH = str(sys.argv[6])
 
-  if (NUM_FRAMES_EACH_VIDEO == -1):
-    VIDEO_DIR = str(sys.argv[3]) if str(sys.argv[3])[-1] == '/' else str(sys.argv[3]) + '/'
-    LABEL_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
-    OUT_PATH = str(sys.argv[5])
+  print(NUM_FRAMES_EACH_VIDEO)
+  print(ZERO_PADDING)
 
-    extract_full_length_feats(VIDEO_DIR, LABEL_DIR, OUT_PATH)
-  else:
-    ZERO_PADDING = True if str(sys.argv[3]) == 'True' else False
-    VIDEO_DIR = str(sys.argv[4]) if str(sys.argv[4])[-1] == '/' else str(sys.argv[4]) + '/'
-    LABEL_PATH = str(sys.argv[5])
-    OUT_PATH = str(sys.argv[6])
-
-    print(NUM_FRAMES_EACH_VIDEO)
-    print(ZERO_PADDING)
-
-    extract_feats(VIDEO_DIR, LABEL_PATH, OUT_PATH, NUM_FRAMES_EACH_VIDEO)
+  extract_feats(VIDEO_DIR, LABEL_PATH, OUT_PATH, NUM_FRAMES_EACH_VIDEO)
 
 if __name__ == '__main__':
   main()
