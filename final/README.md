@@ -41,8 +41,8 @@ Model 已儲存於 repo 中， testing script 如下：
 - $> `cd task2/knn/`
 - $> `./train.sh <train_data_dir>`
 - $> `./test_1.sh <train_data_dir> <test_data_dir> ./`
---> 會輸出 `1_PCA_knn_predict.csv` 及 `1_knn_predict.csv`，分別為有/無PCA機制的 1-shot 結果
+--> 會輸出 `1_PCA_knn_predict.csv` 及 `1_knn_predict.csv`，分別為有/無PCA機制的 1-shot 結果，其中前者分數較高
 - $> `./test_5.sh <train_data_dir> <test_data_dir> ./`
---> 會輸出 `5_PCA_knn_predict.csv` 及 `5_knn_predict.csv`，分別為有/無PCA機制的 5-shot 結果
+--> 會輸出 `5_PCA_knn_predict.csv` 及 `5_knn_predict.csv`，分別為有/無PCA機制的 5-shot 結果，其中前者分數較高
 - $> `./test_10.sh <train_data_dir> <test_data_dir> ./`
---> 會輸出 `10_PCA_knn_predict.csv` 及 `10_knn_predict.csv`，分別為有/無PCA機制的 10-shot 結果
+--> 會輸出 `10_PCA_knn_predict.csv` 及 `10_knn_predict.csv`，分別為有/無PCA機制的 10-shot 結果，其中前者分數較高
