@@ -7,7 +7,7 @@ Model 已儲存於 repo 中， testing script 如下：
 --> 會輸出 `out.csv`
 
 ####Task 2  
-我們實作了4種模型，其中以 (3) performance 最佳，因此**助教可直接跑 (3)**  
+我們實作了4種模型，**其中 (3) 和 (4) 都有過 Baseline，而又以 (4) performance 最佳，因此助教可直接跑 (4)**  
 各模型 training 與 testing script如下：
 
 (1) Siamese Network
@@ -45,4 +45,4 @@ Model 已儲存於 repo 中， testing script 如下：
 - $> `./test_5.sh <train_data_dir> <test_data_dir> ./`
 --> 會輸出 `5_PCA_knn_predict.csv` 及 `5_knn_predict.csv`，分別為有/無PCA機制的 5-shot 結果
 - $> `./test_10.sh <train_data_dir> <test_data_dir> ./`
---> 會輸出 `10_PCA_knn_predict.csv` 及 `10_knn_predict.csv`，分別為有/無 PCA 機制的 10-shot 結果
+--> 會輸出 `10_PCA_knn_predict.csv` 及 `10_knn_predict.csv`，分別為有/無PCA機制的 10-shot 結果
